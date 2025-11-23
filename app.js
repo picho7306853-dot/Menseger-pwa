@@ -1,73 +1,88 @@
 let allMessages = [];
 
-function parseMessengerJSON(text) {
-    try {
-        const data = JSON.parse(text);
-        if (Array.isArray(data)) return data;
-        return data.messages || [];
-    } catch {
-        return [];
-    }
+function processJson(data) {
+    if (!data.messages) return;
+
+    data.messages.forEach(msg => {
+        allMessages.push({
+            sender: msg.sender_name,
+            content: msg.content || "(Sin texto)",
+            timestamp: msg.timestamp_ms
+        });
+    });
+
+    renderMessages(allMessages);
 }
 
 function renderMessages(list) {
     const container = document.getElementById("messages");
-    const count = document.getElementById("count");
+    container.innerHTML = "";
 
-    count.textContent = `Mensajes: ${list.length}`;
+    list.forEach(m => {
+        const div = document.createElement("div");
+        div.className = "message";
 
-    container.innerHTML = list.map(msg => `
-        <div class="message">
-            <strong>${msg.sender_name || "Sin nombre"}</strong><br>
-            <small>${new Date(msg.timestamp_ms).toLocaleString()}</small><br>
-            ${msg.content || "[sin contenido]"}
-        </div>
-    `).join("");
+        const date = new Date(m.timestamp);
+        const fecha = date.toLocaleString();
+
+        div.innerHTML = `
+            <div class="author">${m.sender}</div>
+            <div class="time">${fecha}</div>
+            <div class="text">${m.content}</div>
+        `;
+
+        container.appendChild(div);
+    });
 }
 
+// --- Carga múltiple de archivos JSON ---
+document.getElementById("jsonFile").addEventListener("change", function () {
+    const files = Array.from(this.files);
+
+    files.forEach(file => {
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+            try {
+                const data = JSON.parse(e.target.result);
+                processJson(data);
+            } catch (err) {
+                console.error("Error leyendo JSON:", err);
+            }
+        };
+
+        reader.readAsText(file);
+    });
+});
+
+// --- Filtro por texto y fechas ---
 function applyFilters() {
-    const text = document.getElementById("searchText").value.toLowerCase();
-    const from = document.getElementById("fromDate").value;
-    const to = document.getElementById("toDate").value;
+    const search = document.getElementById("searchInput").value.toLowerCase();
+    const from = document.getElementById("dateFrom").value;
+    const to = document.getElementById("dateTo").value;
 
-    let filtered = allMessages;
+    let filtered = allMessages.filter(m => {
+        let ok = true;
 
-    if (text) {
-        filtered = filtered.filter(m => (m.content || "").toLowerCase().includes(text));
-    }
+        if (search)
+            ok = m.content.toLowerCase().includes(search) || m.sender.toLowerCase().includes(search);
 
-    if (from) {
-        const fromMs = new Date(from).getTime();
-        filtered = filtered.filter(m => m.timestamp_ms >= fromMs);
-    }
+        if (ok && from) {
+            const ts = new Date(from).getTime();
+            ok = m.timestamp >= ts;
+        }
 
-    if (to) {
-        const toMs = new Date(to).getTime();
-        filtered = filtered.filter(m => m.timestamp_ms <= toMs);
-    }
+        if (ok && to) {
+            const ts = new Date(to).getTime() + 86399999;
+            ok = m.timestamp <= ts;
+        }
+
+        return ok;
+    });
 
     renderMessages(filtered);
 }
 
-document.getElementById("parseBtn").onclick = () => {
-    const text = document.getElementById("rawJson").value;
-    const msgs = parseMessengerJSON(text);
-    allMessages = msgs;
-    renderMessages(msgs);
-};
-
-document.getElementById("fileInput").onchange = async (event) => {
-    allMessages = [];
-    for (const file of event.target.files) {
-        const text = await file.text();
-        const msgs = parseMessengerJSON(text);
-        allMessages.push(...msgs);
-    }
-    allMessages.sort((a, b) => a.timestamp_ms - b.timestamp_ms);
-    renderMessages(allMessages);
-};
-
-// filtros en tiempo real
-document.getElementById("searchText").oninput = applyFilters;
-document.getElementById("fromDate").oninput = applyFilters;
-document.getElementById("toDate").oninput = applyFilters;
+document.getElementById("searchInput").addEventListener("input", applyFilters);
+document.getElementById("dateFrom").addEventListener("change", applyFilters);
+document.getElementById("dateTo").addEventListener("change", applyFilters);
