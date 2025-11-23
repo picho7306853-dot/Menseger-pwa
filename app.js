@@ -35,11 +35,13 @@ function renderMessages(list) {
     });
 }
 
-// --- Carga múltiple de archivos JSON ---
+// --- Carga automática desde carpeta ---
 document.getElementById("jsonFile").addEventListener("change", function () {
     const files = Array.from(this.files);
 
-    files.forEach(file => {
+    const jsonFiles = files.filter(f => f.name.toLowerCase().endsWith(".json"));
+
+    jsonFiles.forEach(file => {
         const reader = new FileReader();
 
         reader.onload = function (e) {
@@ -53,6 +55,7 @@ document.getElementById("jsonFile").addEventListener("change", function () {
 
         reader.readAsText(file);
     });
+});
 });
 
 // --- Filtro por texto y fechas ---
