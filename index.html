@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visor Messenger JSON</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h2>Visor de Mensajes Messenger (JSON)</h2>
+
+    <input type="file" id="fileInput" multiple accept="application/json">
+    <textarea id="rawJson" placeholder="Pega JSON aquí..."></textarea>
+
+    <button id="parseBtn">Parsear</button>
+
+    <h3>Filtros</h3>
+    <input id="searchText" placeholder="Buscar texto...">
+    <input id="fromDate" placeholder="Desde (yyyy-mm-dd)" type="date">
+    <input id="toDate" placeholder="Hasta (yyyy-mm-dd)" type="date">
+
+    <h3 id="count"></h3>
+    <div id="messages"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
