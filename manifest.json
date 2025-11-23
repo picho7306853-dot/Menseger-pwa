@@ -1,9 +1,9 @@
 {
-  "name": "Messenger JSON Viewer",
-  "short_name": "MessengerJSON",
+  "name": "Visor Messenger JSON",
+  "short_name": "Messenger JSON",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#0066ff",
+  "theme_color": "#007bff",
   "icons": []
 }
