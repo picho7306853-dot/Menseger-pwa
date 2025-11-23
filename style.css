@@ -1,0 +1,27 @@
+body {
+  font-family: sans-serif;
+  padding: 16px;
+  background: #f4f4f4;
+}
+
+#rawJson {
+  width: 100%;
+  height: 120px;
+  margin-top: 8px;
+}
+
+#messages {
+  margin-top: 16px;
+  background: white;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.message {
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
+}
+
+.message:last-child {
+  border-bottom: none;
+}
